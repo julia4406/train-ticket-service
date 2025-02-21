@@ -29,7 +29,7 @@ class TrainSerializer(serializers.ModelSerializer):
 
 
 class CrewSerializer(serializers.ModelSerializer):
-    full_name = serializers.StringRelatedField()
+    # full_name = serializers.StringRelatedField()
 
     class Meta:
         model = Crew
@@ -59,6 +59,9 @@ class TripSerializer(serializers.ModelSerializer):
     to_station = serializers.CharField(source="route.destination.name", read_only=True)
 
     crew = serializers.PrimaryKeyRelatedField(queryset=Crew.objects.all(), many=True)
+    # crew = serializers.SlugRelatedField(
+    #     many=True, read_only=True, slug_field="full_name"
+    # )
 
     class Meta:
         model = Trip
@@ -74,5 +77,7 @@ class TripSerializer(serializers.ModelSerializer):
         ]
 
 
-class TripDetailSerializer(TripSerializer):
-    crew = CrewSerializer(many=True)
+class TripListSerializer(TripSerializer):
+    crew = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="full_name"
+    )

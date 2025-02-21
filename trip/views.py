@@ -9,7 +9,7 @@ from trip.serializers import (
     StationSerializer,
     RouteSerializer,
     TripSerializer,
-    TripDetailSerializer,
+    TripListSerializer,
 )
 
 
@@ -40,8 +40,10 @@ class RouteViewSet(ModelViewSet):
 
 class TripViewSet(ModelViewSet):
     queryset = Trip.objects.all()
+    serializer_class = TripSerializer
 
+    #
     def get_serializer_class(self):
-        if self.action == "retrieve":
-            return TripDetailSerializer
+        if self.action in ["list", "retrieve"]:
+            return TripListSerializer
         return TripSerializer
