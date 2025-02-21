@@ -10,16 +10,9 @@ class CarriageTypeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CarriageSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Carriage
-        fields = ["id", "number", "total_seats", "type", "train"]
-
-
 class TrainSerializer(serializers.ModelSerializer):
-    carriages = CarriageSerializer()
+    carriages = CarriageTypeSerializer()
 
     class Meta:
         model = models.Train
-        fields = ["id", "name_number", "pseudonym", "carriages"]
+        fields = ["id", "name_number", "carriages"]
