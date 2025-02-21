@@ -55,7 +55,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "Portfolio_DRF_Train_Ticket_Service.urls"
+ROOT_URLCONF = "train_ticket_service.urls"
 
 TEMPLATES = [
     {
@@ -105,6 +105,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "user.User"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -133,13 +134,12 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-#
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 3,
-    "DEFAULT_PERMISSION_CLASSES": [
-        "station.permissions.IsAdminAllOrAuthenticatedReadOnly"
-    ],
+    # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    # "PAGE_SIZE": 3,
+    # "DEFAULT_PERMISSION_CLASSES": [
+    #     "trip.permissions.IsAdminAllOrAuthenticatedReadOnly"
+    # ],
     # JWTAuthentication (нижче)
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -154,8 +154,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Bus Station API",
-    "DESCRIPTION": "Order tickets for your bus trips",
+    "TITLE": "Train Ticket Service API",
+    "DESCRIPTION": "Order tickets for your travels.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SWAGGER_UI_SETTINGS": {
@@ -169,9 +169,9 @@ SPECTACULAR_SETTINGS = {
 # Налаштування для життєвого циклу JWT
 SIMPLE_JWT = {
     # Життєвий цикл токенів:
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),  # час життя access-токена (
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5000),  # час життя access-токена (
     # 10 хвилин).
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
     # час життя refresh-токена (3 дні).
     # Оновлення токенів:
     "ROTATE_REFRESH_TOKENS": False,  # видає новий refresh-токен при оновленні.
