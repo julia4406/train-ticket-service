@@ -11,8 +11,17 @@ class CarriageTypeSerializer(serializers.ModelSerializer):
 
 
 class TrainSerializer(serializers.ModelSerializer):
-    carriages = CarriageTypeSerializer()
+    carriage_type = serializers.PrimaryKeyRelatedField(
+        queryset=models.CarriageType.objects.all()
+    )
+    total_seats = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = models.Train
-        fields = ["id", "name_number", "carriages"]
+        fields = [
+            "id",
+            "name_number",
+            "carriage_type",
+            "carriages_quantity",
+            "total_seats",
+        ]
