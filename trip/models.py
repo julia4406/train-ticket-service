@@ -38,3 +38,17 @@ class Crew(models.Model):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class Station(models.Model):
+    name = models.CharField(max_length=255)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+
+class Route(models.Model):
+    source = models.ForeignKey("Station", on_delete=CASCADE, related_name="sources")
+    destination = models.ForeignKey(
+        "Station", on_delete=CASCADE, related_name="destinations"
+    )
+    distance = models.PositiveIntegerField()

@@ -1,8 +1,13 @@
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
-from trip.models import Train, CarriageType, Crew
-from trip.serializers import TrainSerializer, CarriageTypeSerializer, CrewSerializer
+from trip.models import Train, CarriageType, Crew, Station, Route
+from trip.serializers import (
+    TrainSerializer,
+    CarriageTypeSerializer,
+    CrewSerializer,
+    StationSerializer, RouteSerializer,
+)
 
 
 class CarriageTypeViewSet(ModelViewSet):
@@ -20,4 +25,16 @@ class TrainViewSet(ModelViewSet):
 class CrewViewSet(ModelViewSet):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class StationViewSet(ModelViewSet):
+    queryset = Station.objects.all()
+    serializer_class = StationSerializer
+    permission_classes = [IsAdminUser]
+
+
+class RouteViewSet(ModelViewSet):
+    queryset = Route.objects.all()
+    serializer_class = RouteSerializer
     permission_classes = [IsAuthenticated]

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from trip.models import CarriageType, Train, Crew
+from trip.models import CarriageType, Train, Crew, Station, Route
 
 
 class CarriageTypeSerializer(serializers.ModelSerializer):
@@ -37,3 +37,18 @@ class CrewSerializer(serializers.ModelSerializer):
             "first_name": {"write_only": True},
             "last_name": {"write_only": True},
         }
+
+
+class StationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Station
+        fields = "__all__"
+
+
+class RouteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Route
+        fields = "__all__"
+
