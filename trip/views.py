@@ -42,7 +42,6 @@ class TripViewSet(ModelViewSet):
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
 
-    #
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
             return TripListSerializer

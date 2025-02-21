@@ -155,7 +155,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Train Ticket Service API",
-    "DESCRIPTION": "Order tickets for your travels.",
+    "DESCRIPTION": "Order tickets for trips by train.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SWAGGER_UI_SETTINGS": {

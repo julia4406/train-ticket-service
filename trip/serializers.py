@@ -34,10 +34,16 @@ class CrewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Crew
         fields = ("id", "first_name", "last_name", "full_name")
-        # extra_kwargs = {
-        #     "first_name": {"write_only": True},
-        #     "last_name": {"write_only": True},
-        # }
+        extra_kwargs = {
+            "first_name": {"write_only": True},
+            "last_name": {"write_only": True},
+        }
+
+
+class CrewDetailSerializer(CrewSerializer):
+    class Meta:
+        model = Crew
+        fields = "__all__"
 
 
 class StationSerializer(serializers.ModelSerializer):
