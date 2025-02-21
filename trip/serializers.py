@@ -34,10 +34,10 @@ class CrewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Crew
         fields = ("id", "first_name", "last_name", "full_name")
-        extra_kwargs = {
-            "first_name": {"write_only": True},
-            "last_name": {"write_only": True},
-        }
+        # extra_kwargs = {
+        #     "first_name": {"write_only": True},
+        #     "last_name": {"write_only": True},
+        # }
 
 
 class StationSerializer(serializers.ModelSerializer):
@@ -57,9 +57,8 @@ class RouteSerializer(serializers.ModelSerializer):
 class TripSerializer(serializers.ModelSerializer):
     from_station = serializers.CharField(source="route.source.name", read_only=True)
     to_station = serializers.CharField(source="route.destination.name", read_only=True)
-    crew = serializers.SlugRelatedField(
-        many=True, read_only=True, slug_field="full_name"
-    )
+
+    crew = serializers.PrimaryKeyRelatedField(queryset=Crew.objects.all(), many=True)
 
     class Meta:
         model = Trip
