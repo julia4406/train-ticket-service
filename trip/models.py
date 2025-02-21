@@ -62,7 +62,7 @@ class Route(models.Model):
 
 class Trip(models.Model):
     route = models.ForeignKey("Route", on_delete=CASCADE, related_name="trips")
-    crew = models.ForeignKey("Crew", on_delete=CASCADE, related_name="trips")
+    crew = models.ManyToManyField("Crew", related_name="trips", blank=True)
     train = models.ForeignKey("Train", on_delete=CASCADE, related_name="trips")
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
