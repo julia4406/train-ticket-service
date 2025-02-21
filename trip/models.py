@@ -45,6 +45,9 @@ class Station(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
 
+    def __str__(self):
+        return self.name
+
 
 class Route(models.Model):
     source = models.ForeignKey("Station", on_delete=CASCADE, related_name="sources")
@@ -52,3 +55,20 @@ class Route(models.Model):
         "Station", on_delete=CASCADE, related_name="destinations"
     )
     distance = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.source} - {self.destination} ({self.distance})"
+
+
+class Trip(models.Model):
+    route = models.ForeignKey("Route", on_delete=CASCADE, related_name="trips")
+    crew = models.ForeignKey("Crew", on_delete=CASCADE, related_name="trips")
+    train = models.ForeignKey("Train", on_delete=CASCADE, related_name="trips")
+    departure_time = models.DateTimeField()
+    arrival_time = models.DateTimeField()
+
+    def __str__(self):
+        return (
+            f"{self.route} / departing: {self.departure_time} "
+            f"/arrival: {self.arrival_time}"
+        )

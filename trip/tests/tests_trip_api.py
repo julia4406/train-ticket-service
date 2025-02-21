@@ -49,30 +49,6 @@ class AuthenticatedUserTrainViewSetTest(TestCase):
         res = self.client.get(CARRIAGE_URL)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_trains_list(self):
-        trains = Train.objects.all()
-
-        res = self.client.get(TRAIN_URL)
-
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(Train.objects.count(), 2)
-
-        serializer = TrainSerializer(trains, many=True)
-        self.assertEqual(res.data, serializer.data)
-
-    def test_post_trains_list_with_total_seats_calculation(self):
-        new = Train.objects.create(
-            name_number="003T", carriages_quantity=2, carriage_type=self.carriage2
-        )
-
-        res = self.client.get(TRAIN_URL)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(Train.objects.count(), 3)
-
-        total_seats = new.carriages_quantity * new.carriage_type.seats_in_car
-        train_data = next((train for train in res.data if train["id"] == new.id), None)
-        self.assertEqual(train_data["total_seats"], total_seats)
-
     def test_crews_list_display_only_full_name(self):
         crew = Crew.objects.create(first_name="Name", last_name="Surname")
         expected_data = [{"id": crew.id, "full_name": "Name Surname"}]
@@ -103,6 +79,20 @@ class AdminMovieViewSetTests(TestCase):
         )
         self.client.force_authenticate(user=self.admin)
 
+        self.carriage1 = CarriageType.objects.create(
+            category="test_class1", seats_in_car=50
+        )
+        self.carriage2 = CarriageType.objects.create(
+            category="test_class2", seats_in_car=80
+        )
+
+        self.train1 = Train.objects.create(
+            name_number="001T", carriages_quantity=4, carriage_type=self.carriage1
+        )
+        self.train2 = Train.objects.create(
+            name_number="002T", carriages_quantity=2, carriage_type=self.carriage2
+        )
+
     def test_carriage_list(self):
         CarriageType.objects.create(category="test_class1", seats_in_car=50)
         CarriageType.objects.create(category="test_class2", seats_in_car=80)
@@ -115,6 +105,30 @@ class AdminMovieViewSetTests(TestCase):
 
         serializer = CarriageTypeSerializer(carriages, many=True)
         self.assertEqual(res.data, serializer.data)
+
+    def test_trains_list(self):
+        trains = Train.objects.all()
+
+        res = self.client.get(TRAIN_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(Train.objects.count(), 2)
+
+        serializer = TrainSerializer(trains, many=True)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_post_trains_list_with_total_seats_calculation(self):
+        new = Train.objects.create(
+            name_number="003T", carriages_quantity=2, carriage_type=self.carriage2
+        )
+
+        res = self.client.get(TRAIN_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(Train.objects.count(), 3)
+
+        total_seats = new.carriages_quantity * new.carriage_type.seats_in_car
+        train_data = next((train for train in res.data if train["id"] == new.id), None)
+        self.assertEqual(train_data["total_seats"], total_seats)
 
     def test_station_list(self):
         Station.objects.create(

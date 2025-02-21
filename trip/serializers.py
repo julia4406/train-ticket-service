@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from trip.models import CarriageType, Train, Crew, Station, Route
+from trip.models import CarriageType, Train, Crew, Station, Route, Trip
 
 
 class CarriageTypeSerializer(serializers.ModelSerializer):
@@ -50,4 +51,25 @@ class RouteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Route
-        fields = "__all__"
+        fields = ["source", "destination", "distance"]
+
+
+class TripSerializer(serializers.ModelSerializer):
+    from_station = serializers.CharField(source="route.source.name", read_only=True)
+    to_station = serializers.CharField(source="route.destination.name", read_only=True)
+    crew = serializers.PrimaryKeyRelatedField(
+        queryset=Crew.objects.all(),
+        many=True
+    )
+
+    class Meta:
+        model = Trip
+        fields = [
+            "route",
+            "from_station",
+            "departure_time",
+            "to_station",
+            "arrival_time",
+            "train",
+            "crew",
+        ]
