@@ -4,12 +4,14 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from trip.models import Train, CarriageType, Crew
+from trip.models import Train, CarriageType, Crew, Station
 from trip.serializers import TrainSerializer, CarriageTypeSerializer, CrewSerializer
 
 TRAIN_URL = reverse("trip:train-list")
 CARRIAGE_URL = reverse("trip:carriage-list")
 CREW_URL = reverse("trip:crew-list")
+STATION_URL = reverse("trip:station-list")
+ROUTE_URL = reverse("trip:route-list")
 
 
 class UnauthenticatedUserTrainViewSetTest(TestCase):
@@ -43,7 +45,7 @@ class AuthenticatedUserTrainViewSetTest(TestCase):
             name_number="002T", carriages_quantity=2, carriage_type=self.carriage2
         )
 
-    def test_CarriagesViewSet_not_allowed(self):
+    def test_CarriageViewSet_not_allowed(self):
         res = self.client.get(CARRIAGE_URL)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -84,6 +86,14 @@ class AuthenticatedUserTrainViewSetTest(TestCase):
         self.assertNotIn("first_name", response_data[0])
         self.assertNotIn("last_name", response_data[0])
 
+    def test_StationViewSet_not_allowed(self):
+        res = self.client.get(STATION_URL)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_route_list(self):
+        res = self.client.get(ROUTE_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
 
 class AdminMovieViewSetTests(TestCase):
     def setUp(self):
@@ -93,7 +103,7 @@ class AdminMovieViewSetTests(TestCase):
         )
         self.client.force_authenticate(user=self.admin)
 
-    def test_carriages_list(self):
+    def test_carriage_list(self):
         CarriageType.objects.create(category="test_class1", seats_in_car=50)
         CarriageType.objects.create(category="test_class2", seats_in_car=80)
         carriages = CarriageType.objects.all()
@@ -105,3 +115,16 @@ class AdminMovieViewSetTests(TestCase):
 
         serializer = CarriageTypeSerializer(carriages, many=True)
         self.assertEqual(res.data, serializer.data)
+
+    def test_station_list(self):
+        Station.objects.create(
+            name="Test2 Station", latitude=40.4441, longitude=55.0051
+        )
+        Station.objects.create(
+            name="Test2 Station", latitude=25.4441, longitude=40.0051
+        )
+
+        res = self.client.get(STATION_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(Station.objects.count(), 2)

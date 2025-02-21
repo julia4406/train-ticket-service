@@ -6,7 +6,8 @@ from trip.serializers import (
     TrainSerializer,
     CarriageTypeSerializer,
     CrewSerializer,
-    StationSerializer, RouteSerializer,
+    StationSerializer,
+    RouteSerializer,
 )
 
 
