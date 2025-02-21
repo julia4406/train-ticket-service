@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from trip import models
+
+admin.site.register(models.Train)
+admin.site.register(models.Carriage)
+admin.site.register(models.CarriageType)

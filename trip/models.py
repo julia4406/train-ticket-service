@@ -17,3 +17,4 @@ class Carriage(models.Model):
     type = models.ForeignKey(
         "CarriageType", on_delete=CASCADE, related_name="carriages"
     )
+    train = models.ForeignKey("Train", on_delete=CASCADE, related_name="carriages")
