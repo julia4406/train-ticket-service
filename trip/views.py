@@ -15,6 +15,8 @@ from trip.serializers import (
     OrderListSerializer,
     RouteListSerializer,
     TrainListSerializer,
+    TripDetailSerializer,
+    RouteDetailSerializer,
 )
 
 
@@ -52,8 +54,10 @@ class RouteViewSet(ModelViewSet):
     def get_serializer_class(self):
         serializer = self.serializer_class
 
-        if self.action in ["list", "retrieve"]:
+        if self.action == "list":
             return RouteListSerializer
+        elif self.action == "retrieve":
+            return RouteDetailSerializer
         return serializer
 
 
@@ -62,8 +66,10 @@ class TripViewSet(ModelViewSet):
     serializer_class = TripSerializer
 
     def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
+        if self.action == "list":
             return TripListSerializer
+        elif self.action == "retrieve":
+            return TripDetailSerializer
         return TripSerializer
 
 

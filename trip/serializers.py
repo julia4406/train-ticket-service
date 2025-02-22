@@ -74,6 +74,11 @@ class RouteListSerializer(RouteSerializer):
     )
 
 
+class RouteDetailSerializer(RouteSerializer):
+    source = StationSerializer(read_only=True)
+    destination = StationSerializer(read_only=True)
+
+
 class TripSerializer(serializers.ModelSerializer):
     from_station = serializers.CharField(source="route.source.name", read_only=True)
     to_station = serializers.CharField(source="route.destination.name", read_only=True)
@@ -98,7 +103,37 @@ class TripListSerializer(TripSerializer):
         many=True, read_only=True, slug_field="full_name"
     )
     train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
-    route = RouteListSerializer(read_only=True)
+
+    class Meta:
+        model = Trip
+        fields = [
+            "id",
+            "from_station",
+            "departure_time",
+            "to_station",
+            "arrival_time",
+            "train",
+            "crew",
+        ]
+
+
+class TripDetailSerializer(TripSerializer):
+    crew = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="full_name"
+    )
+    train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
+    route = RouteDetailSerializer(read_only=True)
+
+    class Meta:
+        model = Trip
+        fields = [
+            "id",
+            "route",
+            "departure_time",
+            "arrival_time",
+            "train",
+            "crew",
+        ]
 
 
 class TicketSerializer(serializers.ModelSerializer):
