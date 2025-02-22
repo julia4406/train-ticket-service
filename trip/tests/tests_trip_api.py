@@ -98,6 +98,13 @@ class AuthenticatedUserTrainViewSetTest(TestCase):
     def test_create_order_by_user_allowed(self):
         res = self.client.get(ORDER_URL)
 
+    def test_create_order_with_wrong_seats_and_carriage_number(self):
+        res = self.client.get(ORDER_URL)
+
+    def test_perform_order_list_only_with_orders_of_current_user(self):
+        res = self.client.get(ORDER_URL)
+        # check field created_by
+
 
 class AdminMovieViewSetTests(TestCase):
     def setUp(self):

@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
-from trip.models import Train, CarriageType, Crew, Station, Route, Trip, Order
+from trip.models import Train, CarriageType, Crew, Station, Route, Trip, Order, Ticket
 from trip.serializers import (
     TrainSerializer,
     CarriageTypeSerializer,
@@ -11,6 +11,7 @@ from trip.serializers import (
     TripSerializer,
     TripListSerializer,
     OrderSerializer,
+    TicketSerializer,
 )
 
 
@@ -49,10 +50,18 @@ class TripViewSet(ModelViewSet):
         return TripSerializer
 
 
+class TicketViewSet(ModelViewSet):
+    queryset = Ticket.objects.all()
+    serializer_class = TicketSerializer
+
+
 class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
