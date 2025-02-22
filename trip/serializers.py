@@ -84,3 +84,9 @@ class TripListSerializer(TripSerializer):
         many=True, read_only=True, slug_field="full_name"
     )
     train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
+
+
+class TicketSerializer(serializers.ModelSerializer): ...
+
+
+class OrderSerializer(serializers.ModelSerializer): ...

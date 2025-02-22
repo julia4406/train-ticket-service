@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import CASCADE
 
+from train_ticket_service.settings import AUTH_USER_MODEL
+
 
 # Trains connection
 # -------------------------------
@@ -72,3 +74,25 @@ class Trip(models.Model):
             f"{self.route} / departing: {self.departure_time} "
             f"/arrival: {self.arrival_time}"
         )
+
+
+class Ticket(models.Model):
+    car_num = models.PositiveIntegerField()
+    seat_num = models.PositiveIntegerField()
+    trip = models.ForeignKey("Trip", on_delete=CASCADE, related_name="tickets")
+    order = models.ForeignKey("Order", on_delete=CASCADE, related_name="tickets")
+
+    class Meta:
+        # UniqueConstraint
+        ...
+
+
+class Order(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return str(self.created_at)

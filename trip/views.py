@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
-from trip.models import Train, CarriageType, Crew, Station, Route, Trip
+from trip.models import Train, CarriageType, Crew, Station, Route, Trip, Order
 from trip.serializers import (
     TrainSerializer,
     CarriageTypeSerializer,
@@ -10,6 +10,7 @@ from trip.serializers import (
     RouteSerializer,
     TripSerializer,
     TripListSerializer,
+    OrderSerializer,
 )
 
 
@@ -46,3 +47,8 @@ class TripViewSet(ModelViewSet):
         if self.action in ["list", "retrieve"]:
             return TripListSerializer
         return TripSerializer
+
+
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
