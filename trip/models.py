@@ -91,7 +91,6 @@ class Ticket(models.Model):
 
     def __str__(self):
         return (
-            f"Order #{self.order.id}: "
             f"from {self.trip.route.source} to {self.trip.route.destination} || "
             f"car#: {self.car_num}, seat#: {self.seat_num}"
         )
@@ -105,4 +104,4 @@ class Order(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return str(self.id)
+        return f"#{str(self.id)} tickets: {list(self.tickets.all())}"
