@@ -12,6 +12,8 @@ from trip.serializers import (
     TripListSerializer,
     OrderSerializer,
     TicketSerializer,
+    OrderListSerializer,
+    RouteListSerializer,
 )
 
 
@@ -39,6 +41,13 @@ class RouteViewSet(ModelViewSet):
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
 
+    def get_serializer_class(self):
+        serializer = self.serializer_class
+
+        if self.action in ["list", "retrieve"]:
+            return RouteListSerializer
+        return serializer
+
 
 class TripViewSet(ModelViewSet):
     queryset = Trip.objects.all()
@@ -60,3 +69,10 @@ class OrderViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        serializer = self.serializer_class
+
+        if self.action in ["list", "retrieve"]:
+            return OrderListSerializer
+        return serializer

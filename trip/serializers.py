@@ -62,6 +62,13 @@ class RouteSerializer(serializers.ModelSerializer):
         fields = ["id", "source", "destination", "distance"]
 
 
+class RouteListSerializer(RouteSerializer):
+    source = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+    destination = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="name"
+    )
+
+
 class TripSerializer(serializers.ModelSerializer):
     from_station = serializers.CharField(source="route.source.name", read_only=True)
     to_station = serializers.CharField(source="route.destination.name", read_only=True)
@@ -86,6 +93,7 @@ class TripListSerializer(TripSerializer):
         many=True, read_only=True, slug_field="full_name"
     )
     train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
+    route = RouteSerializer(read_only=True)
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -129,6 +137,10 @@ class TicketSerializer(serializers.ModelSerializer):
         return data
 
 
+class TicketListSerializer(TicketSerializer):
+    trip = TripListSerializer(read_only=True)
+
+
 class OrderSerializer(serializers.ModelSerializer):
     created_by = serializers.SlugField(source="user", read_only=True)
     tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
@@ -144,3 +156,7 @@ class OrderSerializer(serializers.ModelSerializer):
             for ticket in tickets_data:
                 Ticket.objects.create(order=order, **ticket)
             return order
+
+
+class OrderListSerializer(OrderSerializer):
+    tickets = TicketListSerializer(read_only=True, many=True)
