@@ -91,7 +91,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = "__all__"
+        fields = ["trip", "car_num", "seat_num"]
 
     # валідація якщо реалізовано UniqueConstraint а не unique_together
     # validators = [

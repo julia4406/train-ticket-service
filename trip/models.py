@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import CASCADE
+from django.db.models.constraints import UniqueConstraint
 
 from train_ticket_service.settings import AUTH_USER_MODEL
 
@@ -83,8 +84,19 @@ class Ticket(models.Model):
     order = models.ForeignKey("Order", on_delete=CASCADE, related_name="tickets")
 
     class Meta:
-        # UniqueConstraint
-        ...
+        constraints = [
+            UniqueConstraint(
+                fields=["car_num", "seat_num", "trip"],
+                name="unique_car_num_seat_num_trip",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"Order #{self.order.id}: "
+            f"from {self.trip.route.source} to {self.trip.route.destination} || "
+            f"car#: {self.car_num}, seat#: {self.seat_num}"
+        )
 
 
 class Order(models.Model):
@@ -95,4 +107,4 @@ class Order(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return str(self.created_at)
+        return str(self.id)
