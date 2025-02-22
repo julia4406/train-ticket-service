@@ -1,7 +1,8 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from trip.models import CarriageType, Train, Crew, Station, Route, Trip
+from trip.models import CarriageType, Train, Crew, Station, Route, Trip, Ticket, Order
 
 
 class CarriageTypeSerializer(serializers.ModelSerializer):
@@ -86,7 +87,33 @@ class TripListSerializer(TripSerializer):
     train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
 
 
-class TicketSerializer(serializers.ModelSerializer): ...
+class TicketSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ticket
+        fields = "__all__"
+
+    # валідація якщо реалізовано UniqueConstraint а не unique_together
+    # validators = [
+    #         #     UniqueTogetherValidator(
+    #         #         queryset=Ticket.objects.all(),
+    #         #         fields=["seat", "trip"]
+    #         #     )
+    #         # ]
 
 
-class OrderSerializer(serializers.ModelSerializer): ...
+class OrderSerializer(serializers.ModelSerializer):
+    created_by = serializers.SlugField(source="user", read_only=True)
+    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+
+    class Meta:
+        model = Order
+        fields = ["id", "created_at", "created_by", "tickets"]
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            tickets_data = validated_data.pop("tickets")
+            order = Order.objects.create(**validated_data)
+            for ticket in tickets_data:
+                Ticket.objects.create(order=order, **ticket)
+            return order

@@ -21,6 +21,7 @@ CREW_URL = reverse("trip:crew-list")
 STATION_URL = reverse("trip:station-list")
 ROUTE_URL = reverse("trip:route-list")
 TRIP_URL = reverse("trip:trip-list")
+ORDER_URL = reverse("trip:order-list")
 
 
 class UnauthenticatedUserTrainViewSetTest(TestCase):
@@ -93,6 +94,9 @@ class AuthenticatedUserTrainViewSetTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data[0]["crew"], ["Jo Doe"])
         self.assertEqual(res.data[0]["train"], self.train.name_number)
+
+    def test_create_order_by_user_allowed(self):
+        res = self.client.get(ORDER_URL)
 
 
 class AdminMovieViewSetTests(TestCase):
