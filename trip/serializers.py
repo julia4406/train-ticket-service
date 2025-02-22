@@ -47,12 +47,6 @@ class CrewSerializer(serializers.ModelSerializer):
         }
 
 
-class CrewDetailSerializer(CrewSerializer):
-    class Meta:
-        model = Crew
-        fields = "__all__"
-
-
 class StationSerializer(serializers.ModelSerializer):
 
     class Meta:
