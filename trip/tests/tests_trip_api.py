@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from trip.models import Train, CarriageType, Crew, Station, Trip, Route
+from trip.models import Train, CarriageType, Crew, Station, Trip, Route, Order
 from trip.serializers import (
     TrainSerializer,
     CarriageTypeSerializer,
@@ -96,14 +96,70 @@ class AuthenticatedUserTrainViewSetTest(TestCase):
         self.assertEqual(res.data[0]["train"], self.train.name_number)
 
     def test_create_order_by_user_allowed(self):
-        res = self.client.get(ORDER_URL)
+        tickets_data = [
+            {"car_num": 1, "seat_num": 1, "trip": self.trip.id},
+            {"car_num": 1, "seat_num": 2, "trip": self.trip.id},
+        ]
+        order_data = {"tickets": tickets_data}
 
-    def test_create_order_with_wrong_seats_and_carriage_number(self):
-        res = self.client.get(ORDER_URL)
+        res = self.client.post(ORDER_URL, order_data, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        order = Order.objects.get(id=res.data["id"])
+        self.assertEqual(order.tickets.count(), len(tickets_data))
+
+    def test_create_order_with_wrong_carriage_number(self):
+        order_data = {
+            "tickets": [
+                {"car_num": 5, "seat_num": 1, "trip": self.trip.id},
+            ]
+        }
+
+        res = self.client.post(ORDER_URL, order_data, format="json")
+        expected_result = "carriage number must be in range [1, 4] not 5"
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.data["tickets"][0]["car_num"][0], expected_result)
+
+    def test_create_order_with_wrong_seat_number(self):
+        order_data = {
+            "tickets": [
+                {"car_num": 4, "seat_num": 51, "trip": self.trip.id},
+            ]
+        }
+
+        res = self.client.post(ORDER_URL, order_data, format="json")
+
+        expected_result = "seat number must be in range [1, 50] not 51"
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.data["tickets"][0]["seat_num"][0], expected_result)
 
     def test_perform_order_list_only_with_orders_of_current_user(self):
+        order_data = {
+            "tickets": [
+                {"car_num": 2, "seat_num": 10, "trip": self.trip.id},
+            ]
+        }
+        self.client.post(ORDER_URL, order_data, format="json")
+
+        order_data = {
+            "tickets": [
+                {"car_num": 2, "seat_num": 12, "trip": self.trip.id},
+            ]
+        }
+        self.client.post(ORDER_URL, order_data, format="json")
+
+        order_data = {
+            "tickets": [
+                {"car_num": 2, "seat_num": 14, "trip": self.trip.id},
+            ]
+        }
+        self.client.post(ORDER_URL, order_data, format="json")
+
         res = self.client.get(ORDER_URL)
-        # check field created_by
+
+        for order in res.data:
+            self.assertEqual(order["created_by"], "test@test.com")
 
 
 class AdminMovieViewSetTests(TestCase):

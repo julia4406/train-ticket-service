@@ -50,11 +50,6 @@ class TripViewSet(ModelViewSet):
         return TripSerializer
 
 
-class TicketViewSet(ModelViewSet):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
-
-
 class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
