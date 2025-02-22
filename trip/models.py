@@ -5,8 +5,6 @@ from django.db.models.constraints import UniqueConstraint
 from train_ticket_service.settings import AUTH_USER_MODEL
 
 
-# Trains connection
-# -------------------------------
 class CarriageType(models.Model):
     category = models.CharField(max_length=50)
     seats_in_car = models.PositiveIntegerField()

@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueTogetherValidator
 
 from trip.models import CarriageType, Train, Crew, Station, Route, Trip, Ticket, Order
 
@@ -93,13 +94,37 @@ class TicketSerializer(serializers.ModelSerializer):
         model = Ticket
         fields = ["trip", "car_num", "seat_num"]
 
-    # валідація якщо реалізовано UniqueConstraint а не unique_together
-    # validators = [
-    #         #     UniqueTogetherValidator(
-    #         #         queryset=Ticket.objects.all(),
-    #         #         fields=["seat", "trip"]
-    #         #     )
-    #         # ]
+    validators = [
+        UniqueTogetherValidator(
+            queryset=Ticket.objects.all(),
+            fields=["car_num", "seat_num", "trip"],
+            message="Booking prohibited! This place already taken!",
+        )
+    ]
+
+    def validate(self, data):
+        car_num = data["car_num"]
+        seat_num = data["seat_num"]
+        train = data["trip"].train
+
+        total_carriages = train.carriages_quantity
+        total_seats = train.carriage_type.seats_in_car
+
+        if not (1 <= car_num <= total_carriages):
+            raise serializers.ValidationError(
+                {
+                    "car_num": f"carriage number must be in range "
+                    f"[1, {total_carriages}] not {car_num}"
+                }
+            )
+
+        if not (1 <= seat_num <= total_seats):
+            raise serializers.ValidationError(
+                {
+                    "seat_num": f"seat number must be in range "
+                    f"[1, {total_seats}] not {seat_num}"
+                }
+            )
 
 
 class OrderSerializer(serializers.ModelSerializer):
