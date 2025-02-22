@@ -30,6 +30,12 @@ class TrainSerializer(serializers.ModelSerializer):
         ]
 
 
+class TrainListSerializer(TrainSerializer):
+    carriage_type = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="category"
+    )
+
+
 class CrewSerializer(serializers.ModelSerializer):
     # full_name = serializers.StringRelatedField()
 
