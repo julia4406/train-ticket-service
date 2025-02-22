@@ -37,7 +37,6 @@ class TrainListSerializer(TrainSerializer):
 
 
 class CrewSerializer(serializers.ModelSerializer):
-    # full_name = serializers.StringRelatedField()
 
     class Meta:
         model = Crew
@@ -99,7 +98,7 @@ class TripListSerializer(TripSerializer):
         many=True, read_only=True, slug_field="full_name"
     )
     train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
-    route = RouteSerializer(read_only=True)
+    route = RouteListSerializer(read_only=True)
 
 
 class TicketSerializer(serializers.ModelSerializer):
