@@ -170,6 +170,10 @@ class AdminMovieViewSetTests(TestCase):
         )
         self.client.force_authenticate(user=self.admin)
 
+        self.user = get_user_model().objects.create_user(
+            email="test@test.com", password="test_password"
+        )
+
         self.carriage1 = CarriageType.objects.create(
             category="test_class1", seats_in_car=50
         )
@@ -226,3 +230,33 @@ class AdminMovieViewSetTests(TestCase):
         total_seats = new.carriages_quantity * new.carriage_type.seats_in_car
         train_data = next((train for train in res.data if train["id"] == new.id), None)
         self.assertEqual(train_data["total_seats"], total_seats)
+
+    def test_admin_can_see_orders_of_all_users(self):
+        self.client.force_authenticate(user=self.user)
+        order_data = {
+            "tickets": [
+                {"car_num": 2, "seat_num": 10, "trip": self.trip.id},
+            ]
+        }
+        self.client.post(ORDER_URL, order_data, format="json")
+
+        self.client.force_authenticate(user=None)
+        self.client.force_authenticate(user=self.admin)
+
+        order_data = {
+            "tickets": [
+                {"car_num": 2, "seat_num": 12, "trip": self.trip.id},
+            ]
+        }
+        self.client.post(ORDER_URL, order_data, format="json")
+
+        order_data = {
+            "tickets": [
+                {"car_num": 2, "seat_num": 14, "trip": self.trip.id},
+            ]
+        }
+        self.client.post(ORDER_URL, order_data, format="json")
+
+        res = self.client.get(ORDER_URL)
+
+        self.assertEqual(len(res.data), 3)
