@@ -77,6 +77,9 @@ class TripSerializer(serializers.ModelSerializer):
     from_station = serializers.CharField(source="route.source.name", read_only=True)
     to_station = serializers.CharField(source="route.destination.name", read_only=True)
     crew = serializers.PrimaryKeyRelatedField(queryset=Crew.objects.all(), many=True)
+    total_seats_capacity = serializers.IntegerField(
+        source="train.total_seats", read_only=True
+    )
 
     class Meta:
         model = Trip
@@ -88,6 +91,7 @@ class TripSerializer(serializers.ModelSerializer):
             "to_station",
             "arrival_time",
             "train",
+            "total_seats_capacity",
             "crew",
         ]
 
@@ -124,6 +128,7 @@ class TripListSerializer(TripSerializer):
             "to_station",
             "arrival_time",
             "train",
+            "total_seats_capacity",
             "crew",
         ]
 
@@ -143,6 +148,7 @@ class TripDetailSerializer(TripSerializer):
             "departure_time",
             "arrival_time",
             "train",
+            "total_seats_capacity",
             "crew",
         ]
 
