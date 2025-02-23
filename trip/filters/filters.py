@@ -19,15 +19,14 @@ class TripFilter(django_filters.FilterSet):
     source = custom_filters.SourcesTripFilter()
     destination = custom_filters.DestinationsTripFilter()
     crew = custom_filters.CrewTripFilter()
+    train = custom_filters.TrainTripFilter()
 
     class Meta:
         model = Trip
         fields = [
-            "route__source",
-            "route__destination",
-            "crew__first_name",
-            "crew__last_name",
-            "train__name_number",
+            "route",
+            "crew",
+            "train",
             "departure_time",
             "arrival_time",
         ]

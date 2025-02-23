@@ -104,3 +104,17 @@ class CrewTripFilter(django_filters.CharFilter):
                 crew__last_name__icontains=crew
             )
         return queryset.filter(query).distinct()
+
+
+class TrainTripFilter(django_filters.CharFilter):
+    """Filters by train"""
+
+    def filter(self, queryset, value):
+        if not value:
+            return queryset
+
+        train_list = value.split(",")
+        query = Q()
+        for train in train_list:
+            query |= Q(train__name_number__icontains=train)
+        return queryset.filter(query).distinct()

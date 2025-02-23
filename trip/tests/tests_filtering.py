@@ -309,3 +309,13 @@ class TripFilterTests(TestCase):
 
         res = self.client.get(TRIP_URL + "?crew=Hatiko")
         self.assertEqual(len(res.data), 0)
+
+    def test_filter_by_train(self):
+        res = self.client.get(TRIP_URL + "?train=001T")
+        self.assertEqual(len(res.data), 1)
+
+        res = self.client.get(TRIP_URL + "?train=2,3")
+        self.assertEqual(len(res.data), 3)
+
+        res = self.client.get(TRIP_URL + "?train=004")
+        self.assertEqual(len(res.data), 0)
