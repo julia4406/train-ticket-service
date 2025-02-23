@@ -1,9 +1,5 @@
-from datetime import datetime
-
 import django_filters
 from django.db.models import Q
-
-from trip.models import Trip
 
 
 class CitiesRouteFilter(django_filters.CharFilter):
