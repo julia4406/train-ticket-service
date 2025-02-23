@@ -91,6 +91,23 @@ class TripSerializer(serializers.ModelSerializer):
             "crew",
         ]
 
+    def validate(self, data):
+        """Validate if arrival_time bigger than departure_time"""
+        departure_time = data["departure_time"]
+        arrival_time = data["arrival_time"]
+
+        if not (departure_time <= arrival_time):
+            raise serializers.ValidationError(
+                {
+                    f"departure_time > arrival_time: Departure time cannot "
+                    f"be bigger than arrival time, check input parameters! "
+                    f"Your departure_time - {departure_time}, "
+                    f"arrival_time {arrival_time}."
+                }
+            )
+
+        return data
+
 
 class TripListSerializer(TripSerializer):
     crew = serializers.SlugRelatedField(

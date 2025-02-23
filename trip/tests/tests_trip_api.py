@@ -218,7 +218,7 @@ class AdminAuthenticatedTests(TestCase):
         serializer = CarriageTypeSerializer(carriages, many=True)
         self.assertEqual(res.data, serializer.data)
 
-    def test_post_trains_list_with_total_seats_calculation(self):
+    def test_create_trains_list_and_total_seats_calculated(self):
         new = Train.objects.create(
             name_number="003T", carriages_quantity=2, carriage_type=self.carriage2
         )
@@ -290,3 +290,27 @@ class AdminAuthenticatedTests(TestCase):
         res = self.client.get(ORDER_URL + f"?user={self.user.email}")
 
         self.assertEqual(len(res.data), 2)
+
+    def test_trip_create(self):
+        trip_data = {
+            "route": 1,
+            "train": 1,
+            "departure_time": make_aware(datetime(2025, 3, 24, 7, 12, 0)),
+            "arrival_time": make_aware(datetime(2025, 3, 24, 15, 10, 0)),
+        }
+        res = self.client.post(TRIP_URL, trip_data)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_trip_create_with_departure_time_bigger_than_arrival(self):
+        trip_data = {
+            "route": 1,
+            "train": 1,
+            "departure_time": make_aware(datetime(2025, 3, 24, 17, 10, 0)),
+            "arrival_time": make_aware(datetime(2025, 3, 24, 15, 10, 0)),
+        }
+        res = self.client.post(TRIP_URL, trip_data)
+
+        expected_result = "Departure time cannot be bigger than arrival time"
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(expected_result, str(res.data))
