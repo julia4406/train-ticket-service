@@ -88,3 +88,19 @@ class DestinationsTripFilter(django_filters.CharFilter):
         for destination in destination_list:
             query |= Q(route__destination__name__icontains=destination)
         return queryset.filter(query).distinct()
+
+
+class CrewTripFilter(django_filters.CharFilter):
+    """Filters by crew member's first or last name"""
+
+    def filter(self, queryset, value):
+        if not value:
+            return queryset
+
+        crew_list = value.split(",")
+        query = Q()
+        for crew in crew_list:
+            query |= Q(crew__first_name__icontains=crew) | Q(
+                crew__last_name__icontains=crew
+            )
+        return queryset.filter(query).distinct()
