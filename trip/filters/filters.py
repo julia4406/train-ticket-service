@@ -80,3 +80,6 @@ class TripFilter(django_filters.FilterSet):
             "arr",
             "date",
         ]
+
+
+class OrderFilter(django_filters.FilterSet): ...

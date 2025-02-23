@@ -260,3 +260,33 @@ class AdminAuthenticatedTests(TestCase):
         res = self.client.get(ORDER_URL)
 
         self.assertEqual(len(res.data), 3)
+
+    def test_admin_can_filter_orders_from_user(self):
+        self.client.force_authenticate(user=self.user)
+        order_data = {
+            "tickets": [
+                {"car_num": 2, "seat_num": 10, "trip": self.trip.id},
+            ]
+        }
+        self.client.post(ORDER_URL, order_data, format="json")
+
+        order_data = {
+            "tickets": [
+                {"car_num": 2, "seat_num": 12, "trip": self.trip.id},
+            ]
+        }
+        self.client.post(ORDER_URL, order_data, format="json")
+
+        self.client.force_authenticate(user=None)
+        self.client.force_authenticate(user=self.admin)
+
+        order_data = {
+            "tickets": [
+                {"car_num": 2, "seat_num": 14, "trip": self.trip.id},
+            ]
+        }
+        self.client.post(ORDER_URL, order_data, format="json")
+
+        res = self.client.get(ORDER_URL + f"?user={self.user.email}")
+
+        self.assertEqual(len(res.data), 2)

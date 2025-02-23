@@ -3,17 +3,11 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import make_aware
-from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from trip.models import Train, CarriageType, Crew, Station, Trip, Route, Order
-from trip.serializers import (
-    TrainSerializer,
-    CarriageTypeSerializer,
-    CrewSerializer,
-    TripSerializer,
-)
+
 
 TRAIN_URL = reverse("trip:train-list")
 CARRIAGE_URL = reverse("trip:carriage-list")

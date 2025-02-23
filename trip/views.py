@@ -4,7 +4,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
-from trip.filters.filters import RouteFilter, TripFilter
+from trip.filters.filters import RouteFilter, TripFilter, OrderFilter
 from trip.models import Train, CarriageType, Crew, Station, Route, Trip, Order, Ticket
 from trip.serializers import (
     TrainSerializer,
@@ -100,8 +100,13 @@ class OrderViewSet(ModelViewSet):
         if self.request.user.is_staff:
             queryset = Order.objects.all()
 
+            user_filter = self.request.query_params.get("user")
+            if user_filter:
+                queryset = queryset.filter(user__email__icontains=user_filter)
+
         else:
             queryset = Order.objects.filter(user=self.request.user)
+
         return queryset
 
     def perform_create(self, serializer):
