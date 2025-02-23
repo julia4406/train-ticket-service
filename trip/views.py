@@ -95,6 +95,8 @@ class TripViewSet(ModelViewSet):
 class OrderViewSet(ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter]
+    search_fields = ["created_at"]
 
     def get_queryset(self):
         if self.request.user.is_staff:
