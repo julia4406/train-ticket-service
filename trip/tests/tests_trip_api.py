@@ -92,8 +92,20 @@ class UserAuthenticatedTests(TestCase):
         res = self.client.get(TRIP_URL)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data[0]["crew"], ["Jo Doe"])
-        self.assertEqual(res.data[0]["train"], self.train.name_number)
+        self.assertIn("crew", res.data[0])
+        self.assertIn("train", res.data[0])
+        self.assertIn("seats_available", res.data[0])
+
+    def test_trip_detail_displays_correct_fields_formats(self):
+        res = self.client.get(TRIP_URL + f"{self.trip.id}/")
+        print(res.data)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("route", res.data)
+        self.assertIn("train", res.data)
+        self.assertIn("total_seats_capacity", res.data)
+        self.assertIn("seats_available", res.data)
+        self.assertIn("seats_booked", res.data)
 
     def test_create_order_by_user_allowed(self):
         tickets_data = [

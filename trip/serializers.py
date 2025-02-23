@@ -151,8 +151,8 @@ class TripDetailSerializer(TripSerializer):
             "arrival_time",
             "train",
             "total_seats_capacity",
-            "seats_booked",
             "seats_available",
+            "seats_booked",
             "crew",
         ]
 
@@ -221,3 +221,18 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(OrderSerializer):
     tickets = TicketListSerializer(read_only=True, many=True)
+
+
+#
+#
+# class BookedSeatsSerializer(TripSerializer):
+#     car_num = serializers.SlugRelatedField(
+#         slug_field="car_num", source="tickets", many=True, read_only=True
+#     )
+#     seat_num = serializers.SlugRelatedField(
+#         slug_field="seat_num", source="tickets", many=True, read_only=True
+#     )
+#
+#     class Meta:
+#         model = Trip
+#         fields = ["car_num", "seat_num"]
