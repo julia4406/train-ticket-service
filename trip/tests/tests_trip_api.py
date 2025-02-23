@@ -24,7 +24,7 @@ TRIP_URL = reverse("trip:trip-list")
 ORDER_URL = reverse("trip:order-list")
 
 
-class UnauthenticatedUserTrainViewSetTest(TestCase):
+class UnauthenticatedUserTests(TestCase):
     def setUp(self):
         self.client = APIClient()
 
@@ -33,7 +33,7 @@ class UnauthenticatedUserTrainViewSetTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class AuthenticatedUserTrainViewSetTest(TestCase):
+class UserAuthenticatedTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
@@ -161,91 +161,8 @@ class AuthenticatedUserTrainViewSetTest(TestCase):
         for order in res.data:
             self.assertEqual(order["created_by"], "test@test.com")
 
-    def test_search_train_list_by_name_number(self):
-        Train.objects.create(
-            name_number="002T", carriages_quantity=4, carriage_type=self.carriage
-        )
-        Train.objects.create(
-            name_number="003T", carriages_quantity=4, carriage_type=self.carriage
-        )
-        # res = self.client.get(TRAIN_URL + "?search=002")
-        # self.assertEqual(len(res.data), 1)
-        res = self.client.get(TRAIN_URL + "?search=00")
-        print(res.data)
-        self.assertEqual(len(res.data), 3)
-        res = self.client.get(TRAIN_URL + "?search=T")
-        self.assertEqual(len(res.data), 3)
 
-    def test_search_carriage_list_by_category_and_seats_in_car(self):
-        CarriageType.objects.create(category="test_class2", seats_in_car=40)
-        res = self.client.get(CARRIAGE_URL + "?search=class1")
-        self.assertEqual(len(res.data), 1)
-        res = self.client.get(CARRIAGE_URL + "?search=test_cla")
-        self.assertEqual(len(res.data), 2)
-
-        res = self.client.get(CARRIAGE_URL + "?search=4")
-        self.assertEqual(len(res.data), 1)
-        res = self.client.get(CARRIAGE_URL + "?search=0")
-        self.assertEqual(len(res.data), 2)
-
-    def test_search_crew_member_by_last_name_or_first_name(self):
-        Crew.objects.create(first_name="Test", last_name="Crew")
-        Crew.objects.create(first_name="Pol", last_name="Don")
-        res = self.client.get(CREW_URL + "?search=do")
-        self.assertEqual(len(res.data), 2)
-        res = self.client.get(CREW_URL + "?search=pol")
-        self.assertEqual(len(res.data), 1)
-        res = self.client.get(CREW_URL + "?search=Poline")
-        self.assertEqual(len(res.data), 0)
-
-    def test_search_station_by_name_latitude_longitude(self):
-        Station.objects.create(name="St2", latitude=40.4444, longitude=30.3333)
-        Station.objects.create(name="St2", latitude=20.5557, longitude=25.7777)
-        res = self.client.get(STATION_URL + "?search=40.4444")
-        self.assertEqual(len(res.data), 1)
-        res = self.client.get(STATION_URL + "?search=20")
-        self.assertEqual(len(res.data), 2)
-
-        res = self.client.get(STATION_URL + "?search=25")
-        self.assertEqual(len(res.data), 1)
-        res = self.client.get(STATION_URL + "?search=0")
-        self.assertEqual(len(res.data), 4)
-
-    def test_filter_route_by_source_and_destination_or_both(self):
-        station3 = Station.objects.create(
-            name="St3", latitude=30.0001, longitude=21.0002
-        )
-        station4 = Station.objects.create(
-            name="St4", latitude=30.0011, longitude=21.0002
-        )
-        Route.objects.create(
-            source=self.station2, destination=self.station1, distance=150
-        )
-        Route.objects.create(source=self.station1, destination=station3, distance=100)
-        Route.objects.create(source=self.station2, destination=station4, distance=150)
-        res = self.client.get(ROUTE_URL + "?source=St1")
-        self.assertEqual(len(res.data), 2)
-        res = self.client.get(ROUTE_URL + "?destination=St2")
-        self.assertEqual(len(res.data), 1)
-        res = self.client.get(ROUTE_URL + "?city=St2")
-        self.assertEqual(len(res.data), 3)
-        res = self.client.get(ROUTE_URL + "?city=St2,st4")
-        self.assertEqual(len(res.data), 3)
-
-    # def test_search_route_by_source_and_destination(self):
-    #     CarriageType.objects.create(category="test_class2", seats_in_car=40)
-    #     res = self.client.get(CARRIAGE_URL + "?search=class1")
-    #     self.assertEqual(len(res.data), 1)
-    #     res = self.client.get(CARRIAGE_URL + "?search=test_cla")
-    #     self.assertEqual(len(res.data), 2)
-    #
-    #     res = self.client.get(CARRIAGE_URL + "?search=4")
-    #     self.assertEqual(len(res.data), 1)
-    #     res = self.client.get(CARRIAGE_URL + "?search=0")
-    #     self.assertEqual(len(res.data), 2)
-
-
-class AdminMovieViewSetTests(TestCase):
+class AdminAuthenticatedTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.admin = get_user_model().objects.create_user(

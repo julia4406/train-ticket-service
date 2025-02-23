@@ -15,7 +15,7 @@ class CitiesFilter(django_filters.CharFilter):
             query |= Q(source__name__icontains=city) | Q(
                 destination__name__icontains=city
             )
-            return queryset.filter(query).distinct()
+        return queryset.filter(query).distinct()
 
 
 class SourcesFilter(django_filters.CharFilter):
@@ -29,7 +29,7 @@ class SourcesFilter(django_filters.CharFilter):
         query = Q()
         for source in source_list:
             query |= Q(source__name__icontains=source)
-            return queryset.filter(query).distinct()
+        return queryset.filter(query).distinct()
 
 
 class DestinationsFilter(django_filters.CharFilter):
@@ -43,4 +43,4 @@ class DestinationsFilter(django_filters.CharFilter):
         query = Q()
         for destination in destination_list:
             query |= Q(source__name__icontains=destination)
-            return queryset.filter(query).distinct()
+        return queryset.filter(query).distinct()
