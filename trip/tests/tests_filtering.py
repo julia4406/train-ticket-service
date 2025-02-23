@@ -97,7 +97,7 @@ class StandardSearchFilterTests(TestCase):
         self.assertEqual(len(res.data), 4)
 
 
-class CustomDjangoFilterBackendTests(TestCase):
+class RouteFilterTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
@@ -107,9 +107,6 @@ class CustomDjangoFilterBackendTests(TestCase):
 
         self.carriage = CarriageType.objects.create(
             category="test_class1", seats_in_car=50
-        )
-        self.train = Train.objects.create(
-            name_number="001T", carriages_quantity=4, carriage_type=self.carriage
         )
         self.station1 = Station.objects.create(
             name="St1", latitude=10.0001, longitude=11.0002
@@ -124,17 +121,7 @@ class CustomDjangoFilterBackendTests(TestCase):
             name="St4", latitude=40.0001, longitude=41.0002
         )
 
-        self.crew = Crew.objects.create(first_name="Joh", last_name="Doe")
-
-        # self.trip = Trip.objects.create(
-        #     route=self.route,
-        #     train=self.train,
-        #     departure_time=make_aware(datetime(2025, 3, 24, 7, 12, 0)),
-        #     arrival_time=make_aware(datetime(2025, 3, 24, 15, 10, 0)),
-        # )
-        # self.trip.crew.set([self.crew])
-
-    def test_filter_route_by_source_and_destination_or_both(self):
+    def test_filter_route_by_source(self):
         Route.objects.create(
             source=self.station1, destination=self.station2, distance=150
         )
@@ -149,22 +136,160 @@ class CustomDjangoFilterBackendTests(TestCase):
         )
         res = self.client.get(ROUTE_URL + "?source=St1")
         self.assertEqual(len(res.data), 2)
+        res = self.client.get(ROUTE_URL + "?source=st1,St2")
+        self.assertEqual(len(res.data), 3)
+        res = self.client.get(ROUTE_URL + "?source=St4")
+        self.assertEqual(len(res.data), 0)
+
+    def test_filter_route_by_destination(self):
+        Route.objects.create(
+            source=self.station1, destination=self.station2, distance=150
+        )
+        Route.objects.create(
+            source=self.station2, destination=self.station1, distance=150
+        )
+        Route.objects.create(
+            source=self.station1, destination=self.station3, distance=150
+        )
+        Route.objects.create(
+            source=self.station3, destination=self.station4, distance=150
+        )
+
         res = self.client.get(ROUTE_URL + "?destination=St2")
         self.assertEqual(len(res.data), 1)
+        res = self.client.get(ROUTE_URL + "?destination=St1,st3")
+        self.assertEqual(len(res.data), 2)
+        res = self.client.get(ROUTE_URL + "?destination=St2,st4,St3")
+        self.assertEqual(len(res.data), 3)
+
+    def test_filter_route_by_both_source_and_destination(self):
+        Route.objects.create(
+            source=self.station1, destination=self.station2, distance=150
+        )
+        Route.objects.create(
+            source=self.station2, destination=self.station1, distance=150
+        )
+        Route.objects.create(
+            source=self.station1, destination=self.station3, distance=150
+        )
+        Route.objects.create(
+            source=self.station3, destination=self.station4, distance=150
+        )
+
+        res = self.client.get(ROUTE_URL + "?city=St2")
+        self.assertEqual(len(res.data), 2)
         res = self.client.get(ROUTE_URL + "?city=St1")
         self.assertEqual(len(res.data), 3)
         res = self.client.get(ROUTE_URL + "?city=St2,st4")
-        print(res.data)
         self.assertEqual(len(res.data), 3)
 
-    # def test_search_route_by_source_and_destination(self):
-    #     CarriageType.objects.create(category="test_class2", seats_in_car=40)
-    #     res = self.client.get(CARRIAGE_URL + "?search=class1")
-    #     self.assertEqual(len(res.data), 1)
-    #     res = self.client.get(CARRIAGE_URL + "?search=test_cla")
-    #     self.assertEqual(len(res.data), 2)
-    #
-    #     res = self.client.get(CARRIAGE_URL + "?search=4")
-    #     self.assertEqual(len(res.data), 1)
-    #     res = self.client.get(CARRIAGE_URL + "?search=0")
-    #     self.assertEqual(len(res.data), 2)
+
+class TripFilterTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            email="test1@test.com", password="test_password1"
+        )
+        self.client.force_authenticate(user=self.user)
+
+        self.carriage = CarriageType.objects.create(
+            category="test_class1", seats_in_car=50
+        )
+        self.station1 = Station.objects.create(
+            name="St1", latitude=10.0001, longitude=11.0002
+        )
+        self.station2 = Station.objects.create(
+            name="St2", latitude=20.0001, longitude=21.0002
+        )
+        self.station3 = Station.objects.create(
+            name="St3", latitude=30.0001, longitude=31.0002
+        )
+        self.station4 = Station.objects.create(
+            name="St4", latitude=40.0001, longitude=41.0002
+        )
+
+        self.route1 = Route.objects.create(
+            source=self.station1, destination=self.station2, distance=150
+        )
+        self.route2 = Route.objects.create(
+            source=self.station2, destination=self.station1, distance=150
+        )
+        self.route3 = Route.objects.create(
+            source=self.station1, destination=self.station3, distance=150
+        )
+        self.route4 = Route.objects.create(
+            source=self.station3, destination=self.station4, distance=150
+        )
+        self.train1 = Train.objects.create(
+            name_number="001T", carriages_quantity=4, carriage_type=self.carriage
+        )
+        self.train2 = Train.objects.create(
+            name_number="002T", carriages_quantity=4, carriage_type=self.carriage
+        )
+        self.train3 = Train.objects.create(
+            name_number="003T", carriages_quantity=4, carriage_type=self.carriage
+        )
+        self.crew1 = Crew.objects.create(first_name="Joh", last_name="Doe")
+        self.crew2 = Crew.objects.create(first_name="Red", last_name="Hat")
+
+        self.trip1 = Trip.objects.create(
+            route=self.route1,
+            train=self.train1,
+            departure_time=make_aware(datetime(2025, 3, 24, 7, 12, 0)),
+            arrival_time=make_aware(datetime(2025, 3, 24, 15, 10, 0)),
+        )
+        self.trip1.crew.set([self.crew1])
+
+        self.trip2 = Trip.objects.create(
+            route=self.route2,
+            train=self.train2,
+            departure_time=make_aware(datetime(2025, 4, 24, 7, 12, 0)),
+            arrival_time=make_aware(datetime(2025, 4, 24, 15, 10, 0)),
+        )
+        self.trip2.crew.set([self.crew2])
+
+        self.trip3 = Trip.objects.create(
+            route=self.route3,
+            train=self.train3,
+            departure_time=make_aware(datetime(2025, 4, 24, 7, 12, 0)),
+            arrival_time=make_aware(datetime(2025, 4, 24, 15, 10, 0)),
+        )
+        self.trip3.crew.set([self.crew1, self.crew2])
+
+        self.trip4 = Trip.objects.create(
+            route=self.route4,
+            train=self.train2,
+            departure_time=make_aware(datetime(2025, 5, 24, 7, 12, 0)),
+            arrival_time=make_aware(datetime(2025, 5, 24, 15, 10, 0)),
+        )
+        self.trip4.crew.set([self.crew1, self.crew2])
+
+    def test_filter_trip_by_route_source(self):
+        res = self.client.get(TRIP_URL + "?source=St1")
+        self.assertEqual(len(res.data), 2)
+
+        res = self.client.get(TRIP_URL + "?source=st1,St2")
+        self.assertEqual(len(res.data), 3)
+
+        res = self.client.get(TRIP_URL + "?source=St4")
+        self.assertEqual(len(res.data), 0)
+
+    def test_filter_route_by_destination(self):
+        res = self.client.get(TRIP_URL + "?destination=St2")
+        self.assertEqual(len(res.data), 1)
+
+        res = self.client.get(TRIP_URL + "?destination=St1,st3")
+        self.assertEqual(len(res.data), 2)
+
+        res = self.client.get(TRIP_URL + "?destination=St2,st4,St3")
+        self.assertEqual(len(res.data), 3)
+
+    def test_filter_route_by_both_source_and_destination(self):
+        res = self.client.get(TRIP_URL + "?city=St2")
+        self.assertEqual(len(res.data), 2)
+
+        res = self.client.get(TRIP_URL + "?city=St1")
+        self.assertEqual(len(res.data), 3)
+
+        res = self.client.get(TRIP_URL + "?city=St2,st4")
+        self.assertEqual(len(res.data), 3)
