@@ -110,9 +110,9 @@ class TripSerializer(serializers.ModelSerializer):
 
 
 class TripListSerializer(TripSerializer):
-    crew = serializers.SlugRelatedField(
-        many=True, read_only=True, slug_field="full_name"
-    )
+    # crew = serializers.SlugRelatedField(
+    #     many=True, read_only=True, slug_field="full_name"
+    # )
     train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
     seats_available = serializers.IntegerField(read_only=True)
 
@@ -126,7 +126,7 @@ class TripListSerializer(TripSerializer):
             "arrival_time",
             "train",
             "seats_available",
-            "crew",
+            # "crew",
         ]
 
 
@@ -202,6 +202,10 @@ class TicketListSerializer(TicketSerializer):
     trip = TripListSerializer(read_only=True)
 
 
+class TicketDetailSerializer(TicketSerializer):
+    trip = TripDetailSerializer(read_only=True)
+
+
 class OrderSerializer(serializers.ModelSerializer):
     created_by = serializers.SlugField(source="user", read_only=True)
     tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
@@ -221,6 +225,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(OrderSerializer):
     tickets = TicketListSerializer(read_only=True, many=True)
+
+
+class OrderDetailSerializer(OrderSerializer):
+    tickets = TicketDetailSerializer(read_only=True, many=True)
 
 
 #

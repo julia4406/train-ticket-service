@@ -21,6 +21,7 @@ from trip.serializers import (
     TrainListSerializer,
     TripDetailSerializer,
     RouteDetailSerializer,
+    OrderDetailSerializer,
 )
 
 
@@ -126,6 +127,8 @@ class OrderViewSet(ModelViewSet):
     def get_serializer_class(self):
         serializer = self.serializer_class
 
-        if self.action in ["list", "retrieve"]:
+        if self.action == "list":
             return OrderListSerializer
+        elif self.action == "retrieve":
+            return OrderDetailSerializer
         return serializer
