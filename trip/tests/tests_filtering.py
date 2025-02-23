@@ -244,7 +244,7 @@ class TripFilterTests(TestCase):
             route=self.route2,
             train=self.train2,
             departure_time=make_aware(datetime(2025, 4, 24, 7, 12, 0)),
-            arrival_time=make_aware(datetime(2025, 4, 24, 15, 10, 0)),
+            arrival_time=make_aware(datetime(2025, 4, 25, 15, 10, 0)),
         )
         self.trip2.crew.set([self.crew2])
 
@@ -319,3 +319,33 @@ class TripFilterTests(TestCase):
 
         res = self.client.get(TRIP_URL + "?train=004")
         self.assertEqual(len(res.data), 0)
+
+    def test_filter_by_arrival_date(self):
+        res = self.client.get(TRIP_URL + "?arr=2025-03-24")
+        self.assertEqual(len(res.data), 1)
+
+        res = self.client.get(TRIP_URL + "?arr=2025-03-25")
+        self.assertEqual(len(res.data), 0)
+
+        res = self.client.get(TRIP_URL + "?arr=2025-03-24,2025-05-24")
+        self.assertEqual(len(res.data), 2)
+
+    def test_filter_by_departure_date(self):
+        res = self.client.get(TRIP_URL + "?dep=2025-03-24")
+        self.assertEqual(len(res.data), 1)
+
+        res = self.client.get(TRIP_URL + "?dep=2025-03-25")
+        self.assertEqual(len(res.data), 0)
+
+        res = self.client.get(TRIP_URL + "?dep=2025-03-24,2025-05-24")
+        self.assertEqual(len(res.data), 2)
+
+    def test_filter_by_date_departure_and_arrival(self):
+        res = self.client.get(TRIP_URL + "?date=2025-03-24")
+        self.assertEqual(len(res.data), 1)
+
+        res = self.client.get(TRIP_URL + "?date=2025-03-25")
+        self.assertEqual(len(res.data), 0)
+
+        res = self.client.get(TRIP_URL + "?date=2025-03-24,2025-04-24")
+        self.assertEqual(len(res.data), 3)
