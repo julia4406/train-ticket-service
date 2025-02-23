@@ -1,5 +1,10 @@
+from datetime import datetime
+
 import django_filters
 from django.db.models import Q
+from django.utils.timezone import make_aware
+
+from trip.models import Trip
 
 
 class CitiesRouteFilter(django_filters.CharFilter):
@@ -118,3 +123,26 @@ class TrainTripFilter(django_filters.CharFilter):
         for train in train_list:
             query |= Q(train__name_number__icontains=train)
         return queryset.filter(query).distinct()
+
+
+class DateTripFilter(django_filters.FilterSet):
+    """Filters by date in departure or arriving"""
+
+    date = django_filters.CharFilter(method="filter_by_dates")
+
+    def filter_by_dates(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        date_list = value.split(",")
+
+        query = Q()
+        for date in date_list:
+            date_obj = datetime.strptime(date.strip(), "%Y-%m-%d").date()
+            query |= Q(departure_time__date=date_obj) | Q(arrival_time__date=date_obj)
+
+        return queryset.filter(query).distinct()
+
+    class Meta:
+        model = Trip
+        fields = []
