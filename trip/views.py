@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Count, F
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -83,6 +83,15 @@ class TripViewSet(ModelViewSet):
     serializer_class = TripSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = TripFilter
+
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action in ["list", "retrieve"]:
+            queryset = queryset.select_related().annotate(
+                seats_booked=Count("tickets"),
+                seats_available=F("train__total_seats") - Count("tickets"),
+            )
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":

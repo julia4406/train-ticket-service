@@ -77,9 +77,6 @@ class TripSerializer(serializers.ModelSerializer):
     from_station = serializers.CharField(source="route.source.name", read_only=True)
     to_station = serializers.CharField(source="route.destination.name", read_only=True)
     crew = serializers.PrimaryKeyRelatedField(queryset=Crew.objects.all(), many=True)
-    total_seats_capacity = serializers.IntegerField(
-        source="train.total_seats", read_only=True
-    )
 
     class Meta:
         model = Trip
@@ -91,7 +88,6 @@ class TripSerializer(serializers.ModelSerializer):
             "to_station",
             "arrival_time",
             "train",
-            "total_seats_capacity",
             "crew",
         ]
 
@@ -118,6 +114,7 @@ class TripListSerializer(TripSerializer):
         many=True, read_only=True, slug_field="full_name"
     )
     train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
+    seats_available = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Trip
@@ -128,7 +125,7 @@ class TripListSerializer(TripSerializer):
             "to_station",
             "arrival_time",
             "train",
-            "total_seats_capacity",
+            "seats_available",
             "crew",
         ]
 
@@ -139,6 +136,11 @@ class TripDetailSerializer(TripSerializer):
     )
     train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
     route = RouteDetailSerializer(read_only=True)
+    total_seats_capacity = serializers.IntegerField(
+        source="train.total_seats", read_only=True
+    )
+    seats_available = serializers.IntegerField(read_only=True)
+    seats_booked = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Trip
@@ -149,6 +151,8 @@ class TripDetailSerializer(TripSerializer):
             "arrival_time",
             "train",
             "total_seats_capacity",
+            "seats_booked",
+            "seats_available",
             "crew",
         ]
 
