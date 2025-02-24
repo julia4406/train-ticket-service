@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -87,8 +88,12 @@ WSGI_APPLICATION = "train_ticket_service.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ["POSTGRES_DB"],
+        "USER": os.environ["POSTGRES_USER"],
+        "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+        "HOST": os.environ["POSTGRES_HOST"],
+        "PORT": os.environ["POSTGRES_PORT"],
     }
 }
 
@@ -154,7 +159,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
     ],
-    "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "1000/day"},
+    "DEFAULT_THROTTLE_RATES": {"anon": "10/day", "user": "1000/day"},
 }
 
 SPECTACULAR_SETTINGS = {
@@ -170,53 +175,8 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-# Налаштування для життєвого циклу JWT
 SIMPLE_JWT = {
-    # Життєвий цикл токенів:
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5000),  # час життя access-токена (
-    # 10 хвилин).
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
-    "ROTATE_REFRESH_TOKENS": False,  # видає новий refresh-токен при оновленні.
-    # "BLACKLIST_AFTER_ROTATION": False,  # якщо True, старі refresh-токени додаються в чорний список.
-    # "UPDATE_LAST_LOGIN": False, #  якщо True, оновлює поле last_login користувача при автентифікації.
-    #
-    # # Алгоритми шифрування:
-    # "ALGORITHM": "HS256",   # алгоритм підпису токена (HS256)
-    # "SIGNING_KEY": settings.SECRET_KEY, # ключ для підпису (settings.SECRET_KEY)
-    # "VERIFYING_KEY": "",    # публічний ключ для перевірки токена (необов'язковий)
-    # "AUDIENCE": None,   # аудиторія токена (None, тобто не використовується)
-    # "ISSUER": None, # видавець токена (None, тобто не перевіряється)
-    # "JSON_ENCODER": None,   # кастомний JSON-енкодер для токенів (None, тобто стандартний)
-    # "JWK_URL": None,    # URL для отримання JSON Web Keys (JWK), якщо використовуються асиметричні ключі
-    # "LEEWAY": 0,    # допустиме відхилення у часі при перевірці токена (0 секунд)
-    #
-    # # Автентифікація:
-    # "AUTH_HEADER_TYPES": ("Bearer",),   # тип заголовка для токена (Bearer)
-    # "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",   #  HTTP-заголовок для токена (HTTP_AUTHORIZATION).
-    # "USER_ID_FIELD": "id",   #  поле моделі користувача для збереження ідентифікатора (id).
-    # "USER_ID_CLAIM": "user_id",   # назва claim, що містить ID користувача (user_id).
-    # "USER_AUTHENTICATION_RULE":
-    #     "rest_framework_simplejwt.authentication.default_user_authentication_rule",   # функція для перевірки користувача при аутентифікації.
-    #
-    # # Типи токенів:
-    # "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),   # клас токена (AccessToken).
-    # "TOKEN_TYPE_CLAIM": "token_type",   # claim, що визначає тип токена (token_type).
-    # "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",   # клас користувача, що використовується в токенах (TokenUser).
-    #
-    # # JTI (уникнення повторного використання токенів):
-    # "JTI_CLAIM": "jti",   # claim, що зберігає унікальний ідентифікатор токена (jti).
-    #
-    # # Sliding-токени (альтернативний механізм оновлення токенів):
-    # "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",   # claim, що зберігає час життя refresh-токена.
-    # "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),   # час життя sliding access-токена (5 хвилин).
-    # "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),   # час життя sliding refresh-токена (1 день).
-    #
-    # # Серіалізатори:
-    # "TOKEN_OBTAIN_SERIALIZER":
-    #     "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",   # серіалізатор для отримання access/refresh-токена.
-    # "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",   # серіалізатор для оновлення access-токена.
-    # "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",   # серіалізатор для перевірки валідності токена.
-    # "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",   # серіалізатор для додавання токенів у чорний список.
-    # "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",   # серіалізатор для отримання sliding-токена.
-    # "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",   # серіалізатор для оновлення sliding-токена.
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
 }
