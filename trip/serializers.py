@@ -1,4 +1,5 @@
 from django.db import transaction
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -36,6 +37,7 @@ class TrainListSerializer(TrainSerializer):
 
 
 class CrewSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(read_only=True)
 
     class Meta:
         model = Crew
@@ -224,18 +226,3 @@ class OrderListSerializer(OrderSerializer):
 
 class OrderDetailSerializer(OrderSerializer):
     tickets = TicketDetailSerializer(read_only=True, many=True)
-
-
-#
-#
-# class BookedSeatsSerializer(TripSerializer):
-#     car_num = serializers.SlugRelatedField(
-#         slug_field="car_num", source="tickets", many=True, read_only=True
-#     )
-#     seat_num = serializers.SlugRelatedField(
-#         slug_field="seat_num", source="tickets", many=True, read_only=True
-#     )
-#
-#     class Meta:
-#         model = Trip
-#         fields = ["car_num", "seat_num"]

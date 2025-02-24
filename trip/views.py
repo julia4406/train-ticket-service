@@ -6,6 +6,12 @@ from rest_framework.viewsets import ModelViewSet
 
 from trip.filters.filters import RouteFilter, TripFilter
 from trip.models import Train, CarriageType, Crew, Station, Route, Trip, Order, Ticket
+from trip.schemas.carriage_type_schema_decorators import carriage_filter_schema
+from trip.schemas.crew_schema_decorators import crew_filter_schema
+from trip.schemas.order_schema_decorators import order_filter_schema
+
+from trip.schemas.station_schema_decorators import station_filter_schema
+from trip.schemas.train_schema_decorators import train_filter_schema
 from trip.serializers import (
     TrainSerializer,
     CarriageTypeSerializer,
@@ -33,6 +39,13 @@ class CarriageTypeViewSet(ModelViewSet):
         "seats_in_car",
     ]
 
+    @carriage_filter_schema()
+    def list(self, request, *args, **kwargs):
+        """
+        Return filtered list if query parameters exists, else - full list of items
+        """
+        return super().list(request, *args, **kwargs)
+
 
 class TrainViewSet(ModelViewSet):
     queryset = Train.objects.select_related()
@@ -47,6 +60,13 @@ class TrainViewSet(ModelViewSet):
             return TrainListSerializer
         return serializer
 
+    @train_filter_schema()
+    def list(self, request, *args, **kwargs):
+        """
+        Return filtered list if query parameters exists, else - full list of items
+        """
+        return super().list(request, *args, **kwargs)
+
 
 class CrewViewSet(ModelViewSet):
     queryset = Crew.objects.all()
@@ -54,12 +74,26 @@ class CrewViewSet(ModelViewSet):
     filter_backends = [SearchFilter]
     search_fields = ["first_name", "last_name"]
 
+    @crew_filter_schema()
+    def list(self, request, *args, **kwargs):
+        """
+        Return filtered list if query parameters exists, else - full list of items
+        """
+        return super().list(request, *args, **kwargs)
+
 
 class StationViewSet(ModelViewSet):
     queryset = Station.objects.all()
     serializer_class = StationSerializer
     filter_backends = [SearchFilter]
     search_fields = ["name", "latitude", "longitude"]
+
+    @station_filter_schema()
+    def list(self, request, *args, **kwargs):
+        """
+        Return filtered list if query parameters exists, else - full list of items
+        """
+        return super().list(request, *args, **kwargs)
 
 
 class RouteViewSet(ModelViewSet):
@@ -141,3 +175,10 @@ class OrderViewSet(ModelViewSet):
         elif self.action == "retrieve":
             return OrderDetailSerializer
         return serializer
+
+    @order_filter_schema()
+    def list(self, request, *args, **kwargs):
+        """
+        Return filtered list if query parameters exists, else - full list of items
+        """
+        return super().list(request, *args, **kwargs)

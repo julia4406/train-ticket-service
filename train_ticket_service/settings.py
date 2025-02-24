@@ -141,10 +141,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    # ---PAGINATION---- uncomment 2 bottom lines to use pagination
-    # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    # "PAGE_SIZE": 5,
-    # ---END-of-PAGINATION----
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": None,
     "DEFAULT_PERMISSION_CLASSES": [
         "trip.permissions.IsAdminAllOrAuthenticatedReadOnly"
     ],
@@ -178,8 +176,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5000),  # час життя access-токена (
     # 10 хвилин).
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
-    # час життя refresh-токена (3 дні).
-    # Оновлення токенів:
     "ROTATE_REFRESH_TOKENS": False,  # видає новий refresh-токен при оновленні.
     # "BLACKLIST_AFTER_ROTATION": False,  # якщо True, старі refresh-токени додаються в чорний список.
     # "UPDATE_LAST_LOGIN": False, #  якщо True, оновлює поле last_login користувача при автентифікації.
