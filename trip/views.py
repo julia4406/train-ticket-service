@@ -1,10 +1,10 @@
-from django.db.models import Q, Count, F
+from django.db.models import Count, F, Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from trip.filters.filters import RouteFilter, TripFilter, OrderFilter
+from trip.filters.filters import RouteFilter, TripFilter
 from trip.models import Train, CarriageType, Crew, Station, Route, Trip, Order, Ticket
 from trip.serializers import (
     TrainSerializer,
@@ -15,7 +15,6 @@ from trip.serializers import (
     TripSerializer,
     TripListSerializer,
     OrderSerializer,
-    TicketSerializer,
     OrderListSerializer,
     RouteListSerializer,
     TrainListSerializer,
@@ -36,7 +35,7 @@ class CarriageTypeViewSet(ModelViewSet):
 
 
 class TrainViewSet(ModelViewSet):
-    queryset = Train.objects.all()
+    queryset = Train.objects.select_related()
     serializer_class = TrainSerializer
     filter_backends = [SearchFilter]
     search_fields = ["name_number"]
@@ -64,7 +63,7 @@ class StationViewSet(ModelViewSet):
 
 
 class RouteViewSet(ModelViewSet):
-    queryset = Route.objects.all()
+    queryset = Route.objects.select_related()
     serializer_class = RouteSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = RouteFilter
@@ -88,9 +87,13 @@ class TripViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
         if self.action in ["list", "retrieve"]:
-            queryset = queryset.select_related().annotate(
-                seats_booked=Count("tickets"),
-                seats_available=F("train__total_seats") - Count("tickets"),
+            queryset = (
+                queryset.select_related()
+                .prefetch_related()
+                .annotate(
+                    seats_booked=Count("tickets"),
+                    seats_available=F("train__total_seats") - Count("tickets"),
+                )
             )
         return queryset
 
@@ -109,15 +112,21 @@ class OrderViewSet(ModelViewSet):
     search_fields = ["created_at"]
 
     def get_queryset(self):
-        if self.request.user.is_staff:
+        if self.action in ["list", "retrieve"]:
+            queryset = Order.objects.select_related().prefetch_related(
+                Prefetch(
+                    "tickets", queryset=Ticket.objects.select_related("trip__route")
+                )
+            )
+        else:
             queryset = Order.objects.all()
 
-            user_filter = self.request.query_params.get("user")
-            if user_filter:
-                queryset = queryset.filter(user__email__icontains=user_filter)
+        if not self.request.user.is_staff:
+            return queryset.filter(user=self.request.user)
 
-        else:
-            queryset = Order.objects.filter(user=self.request.user)
+        user_filter = self.request.query_params.get("user")
+        if user_filter:
+            queryset = queryset.filter(user__email__icontains=user_filter)
 
         return queryset
 

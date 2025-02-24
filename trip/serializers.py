@@ -1,6 +1,5 @@
 from django.db import transaction
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from trip.models import CarriageType, Train, Crew, Station, Route, Trip, Ticket, Order
@@ -110,9 +109,6 @@ class TripSerializer(serializers.ModelSerializer):
 
 
 class TripListSerializer(TripSerializer):
-    # crew = serializers.SlugRelatedField(
-    #     many=True, read_only=True, slug_field="full_name"
-    # )
     train = serializers.SlugRelatedField(read_only=True, slug_field="name_number")
     seats_available = serializers.IntegerField(read_only=True)
 
@@ -126,7 +122,6 @@ class TripListSerializer(TripSerializer):
             "arrival_time",
             "train",
             "seats_available",
-            # "crew",
         ]
 
 

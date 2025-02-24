@@ -90,15 +90,12 @@ class UserAuthenticatedTests(TestCase):
 
     def test_trip_list_displays_correct_fields_formats(self):
         res = self.client.get(TRIP_URL)
-
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn("crew", res.data[0])
         self.assertIn("train", res.data[0])
         self.assertIn("seats_available", res.data[0])
 
     def test_trip_detail_displays_correct_fields_formats(self):
         res = self.client.get(TRIP_URL + f"{self.trip.id}/")
-        print(res.data)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn("route", res.data)
