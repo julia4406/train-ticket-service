@@ -1,4 +1,4 @@
-FROM python:3.10.0-slim-buster
+FROM python:3.10.0
 
 LABEL authors="julia4406@gmail.com"
 
