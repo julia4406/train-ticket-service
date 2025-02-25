@@ -16,7 +16,7 @@ Clone this repository to your local machine using the following command:
 
 ```
 git clone https://github.com/julia4406/train-ticket-service
-cd train-ticket-service
+cd train-ticket-service/src
 ```
 
 ## 2. Set up a virtual environment (optional)
