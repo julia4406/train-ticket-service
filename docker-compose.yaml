@@ -36,7 +36,7 @@ services:
 
   web:
     restart: always
-    image: julia4406/portfolio_drf_train_ticket_service
+    image: julia4406/train_ticket_service_api_drf
     build: .
     container_name: trip-backend
     command: ["/bin/sh", "/usr/src/commands/run_trip_backend.sh"]
