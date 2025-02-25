@@ -1,5 +1,6 @@
 from django.db.models import Count, F, Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
@@ -30,6 +31,7 @@ from trip.serializers import (
 )
 
 
+@extend_schema(tags=["carriages"])
 class CarriageTypeViewSet(ModelViewSet):
     queryset = CarriageType.objects.all()
     serializer_class = CarriageTypeSerializer
@@ -47,6 +49,7 @@ class CarriageTypeViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
+@extend_schema(tags=["trains"])
 class TrainViewSet(ModelViewSet):
     queryset = Train.objects.select_related()
     serializer_class = TrainSerializer
@@ -68,6 +71,7 @@ class TrainViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
+@extend_schema(tags=["crews"])
 class CrewViewSet(ModelViewSet):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
@@ -82,6 +86,7 @@ class CrewViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
+@extend_schema(tags=["stations"])
 class StationViewSet(ModelViewSet):
     queryset = Station.objects.all()
     serializer_class = StationSerializer
@@ -96,6 +101,7 @@ class StationViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
+@extend_schema(tags=["routes"])
 class RouteViewSet(ModelViewSet):
     queryset = Route.objects.select_related()
     serializer_class = RouteSerializer
@@ -112,6 +118,7 @@ class RouteViewSet(ModelViewSet):
         return serializer
 
 
+@extend_schema(tags=["trips"])
 class TripViewSet(ModelViewSet):
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
@@ -139,6 +146,7 @@ class TripViewSet(ModelViewSet):
         return TripSerializer
 
 
+@extend_schema(tags=["orders"])
 class OrderViewSet(ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
