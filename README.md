@@ -21,6 +21,29 @@ API service for management tickets ordering from railway company written on DRF
     -  swagger api/doc/swagger/
     -  redoc api/doc/redoc/
 
+## Other notes about version 1.0.0:
+- trains consists of carriages of one type only
+- tickets can be created and viewed through ORDER-endpoint only
+- PAGINATION 
+    - off by default
+    - pagination can be controlled using query parameters
+    - The `limit` and `offset` parameters allow adjusting the response size and starting position
+      - **Example**
+      - `GET /trips/` → returns all items
+      - `GET /trips/?limit=10` → returns 10 items per page
+      - `GET /trips/?limit=5&offset=15` → returns 5 items starting 
+        from 16th
+- Search and filtering available on all endpoints. See documentation: `swagger api/doc/swagger/`
+- Ticket validation includes:
+    - Impossible to book one seat twice (prevents double booking)
+- Trip date validation (arrival time cannot be earlier than departure time)
+- *Orders:*
+  - for users: allowed only orders from this account
+  - for administrators: all orders can be viewed
+- Configured to show quantity of seats:
+  - in list view: total available in train for trip
+  - in detail view: seats booked, total seats capacity, seats available(free)
+
 
 ****
 # 🔧 Setup and launch
@@ -35,7 +58,7 @@ API service for management tickets ordering from railway company written on DRF
 ****
 
 - ***Docker should be installed!***
-- Download image [https://hub.docker.com/u/julia4406](https://hub.docker.com/u/julia4406)
+- Download image [https://hub.docker.com/repository/docker/julia4406/train_ticket_service_api_drf/](https://hub.docker.com/repository/docker/julia4406/train_ticket_service_api_drf/general)
 
 ```
 docker-compose build
