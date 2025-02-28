@@ -51,7 +51,7 @@ class CarriageTypeViewSet(ModelViewSet):
 
 @extend_schema(tags=["trains"])
 class TrainViewSet(ModelViewSet):
-    queryset = Train.objects.select_related()
+    queryset = Train.objects.select_related("carriage_type")
     serializer_class = TrainSerializer
     filter_backends = [SearchFilter]
     search_fields = ["name_number"]
@@ -129,8 +129,8 @@ class TripViewSet(ModelViewSet):
         queryset = self.queryset
         if self.action in ["list", "retrieve"]:
             queryset = (
-                queryset.select_related()
-                .prefetch_related()
+                queryset.select_related("route", "train")
+                .prefetch_related("tickets")
                 .annotate(
                     seats_booked=Count("tickets"),
                     seats_available=F("train__total_seats") - Count("tickets"),
@@ -155,7 +155,7 @@ class OrderViewSet(ModelViewSet):
 
     def get_queryset(self):
         if self.action in ["list", "retrieve"]:
-            queryset = Order.objects.select_related().prefetch_related(
+            queryset = Order.objects.select_related("user").prefetch_related(
                 Prefetch(
                     "tickets", queryset=Ticket.objects.select_related("trip__route")
                 )
