@@ -6,7 +6,7 @@ from train_ticket_service.settings import AUTH_USER_MODEL
 
 
 class CarriageType(models.Model):
-    category = models.CharField(max_length=50)
+    category = models.CharField(max_length=63)
     seats_in_car = models.PositiveIntegerField()
 
     def __str__(self):
@@ -14,7 +14,7 @@ class CarriageType(models.Model):
 
 
 class Train(models.Model):
-    name_number = models.CharField(max_length=50)
+    name_number = models.CharField(max_length=63)
     carriages_quantity = models.PositiveIntegerField()
     carriage_type = models.ForeignKey(
         "CarriageType", on_delete=CASCADE, related_name="carriages"
@@ -30,8 +30,8 @@ class Train(models.Model):
 
 
 class Crew(models.Model):
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=127)
+    last_name = models.CharField(max_length=127)
 
     @property
     def full_name(self):
