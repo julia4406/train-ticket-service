@@ -15,8 +15,8 @@ API service for management tickets ordering from railway company written on DRF
 
 ## Endpoints:
 
-  - main service via api/trip/
-  - user actions(create, access token, profile) via api/user/
+  - main service via api/trips/
+  - user actions(create, access token, profile) via api/users/
   - documentation:
     -  swagger api/doc/swagger/
     -  redoc api/doc/redoc/
@@ -82,7 +82,7 @@ with demo-data:
 ## Getting access:
 ****
 
-- create user via /api/user/register/
-- get access token via /api/user/token/
-- starting endpoint via /api/trip/trips/
+- create user via /api/users/register/
+- get access token via /api/users/token/
+- starting endpoint via /api/trips/trips/
 
