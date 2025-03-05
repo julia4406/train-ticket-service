@@ -32,7 +32,7 @@ class TrainSerializer(serializers.ModelSerializer):
 
 class TrainListSerializer(TrainSerializer):
     carriage_type = serializers.SlugRelatedField(
-        many=False, read_only=True, slug_field="category"
+        read_only=True, slug_field="category"
     )
 
 
@@ -63,10 +63,8 @@ class RouteSerializer(serializers.ModelSerializer):
 
 
 class RouteListSerializer(RouteSerializer):
-    source = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
-    destination = serializers.SlugRelatedField(
-        many=False, read_only=True, slug_field="name"
-    )
+    source = serializers.SlugRelatedField(read_only=True, slug_field="name")
+    destination = serializers.SlugRelatedField(read_only=True, slug_field="name")
 
 
 class RouteDetailSerializer(RouteSerializer):
@@ -205,7 +203,7 @@ class TicketDetailSerializer(TicketSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     created_by = serializers.SlugField(source="user", read_only=True)
-    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+    tickets = TicketSerializer(many=True, allow_empty=False)
 
     class Meta:
         model = Order
