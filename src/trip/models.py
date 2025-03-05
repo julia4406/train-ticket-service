@@ -33,12 +33,12 @@ class Crew(models.Model):
     first_name = models.CharField(max_length=127)
     last_name = models.CharField(max_length=127)
 
-    @property
-    def full_name(self):
-        return f"{self.first_name} {self.last_name}"
-
     def __str__(self):
         return self.first_name + " " + self.last_name
+
+    @property
+    def full_name(self):
+        return str(self)
 
 
 class Station(models.Model):
