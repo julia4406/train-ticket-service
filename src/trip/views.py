@@ -51,7 +51,7 @@ class CarriageTypeViewSet(ModelViewSet):
 
 @extend_schema(tags=["trains"])
 class TrainViewSet(ModelViewSet):
-    queryset = Train.objects.select_related()
+    queryset = Train.objects.select_related("carriage_type")
     serializer_class = TrainSerializer
     filter_backends = [SearchFilter]
     search_fields = ["name_number"]
@@ -103,7 +103,7 @@ class StationViewSet(ModelViewSet):
 
 @extend_schema(tags=["routes"])
 class RouteViewSet(ModelViewSet):
-    queryset = Route.objects.select_related()
+    queryset = Route.objects.select_related("source", "destination")
     serializer_class = RouteSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = RouteFilter
@@ -127,10 +127,20 @@ class TripViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-        if self.action in ["list", "retrieve"]:
+        if self.action == "list":
             queryset = (
-                queryset.select_related()
-                .prefetch_related()
+                queryset.select_related(
+                    "route__source", "route__destination", "train"
+                )
+                .prefetch_related("crew", "tickets")
+                .annotate(
+                    seats_available=F("train__total_seats") - Count("tickets"),
+                )
+            )
+        elif self.action == "retrieve":
+            queryset = (
+                queryset.select_related("route", "train")
+                .prefetch_related("crew", "tickets")
                 .annotate(
                     seats_booked=Count("tickets"),
                     seats_available=F("train__total_seats") - Count("tickets"),
@@ -155,7 +165,7 @@ class OrderViewSet(ModelViewSet):
 
     def get_queryset(self):
         if self.action in ["list", "retrieve"]:
-            queryset = Order.objects.select_related().prefetch_related(
+            queryset = Order.objects.select_related("user").prefetch_related(
                 Prefetch(
                     "tickets", queryset=Ticket.objects.select_related("trip__route")
                 )
